@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D models</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+/* ---------- Design tokens: change the look here, nowhere else ---------- */
+:root {
+  /* Fjord slate, bone, weathered bronze, glacier blue */
+  --bg: #171c20;
+  --surface: #20272c;
+  --surface-2: #2a333a;
+  --line: #3c4750;
+  --text: #e9e3d5;
+  --text-muted: #a8a496;
+  --accent: #c49a5a;
+  --accent-ink: #1c1509;
+  --focus: #8fb8c9;
+  --scrim: rgb(9 12 14 / 0.82);
+
+  --font: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.5rem;
+  --text-xl: clamp(2.5rem, 7vw, 4.5rem);
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 2rem;
+  --space-4: 4rem;
+
+  --radius: 0.375rem;
+  --measure: 40ch;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.wrap { max-width: 72rem; margin: 0 auto; padding: var(--space-4) var(--space-2); }
+
+/* ---------- Header ---------- */
+h1 { margin: 0; font-size: var(--text-xl); font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; }
+.intro { margin: var(--space-2) 0 0; max-width: var(--measure); color: var(--text-muted); }
+.divider { display: block; width: 100%; height: 12px; margin: var(--space-3) 0; color: var(--accent); opacity: 0.7; }
+
+/* ---------- Gallery ---------- */
+.grid { display: grid; gap: var(--space-2); grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); }
+.card {
+  display: grid; align-content: start; gap: var(--space-1);
+  padding: var(--space-2); text-align: left; cursor: pointer;
+  background: var(--surface); color: inherit; font: inherit;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  transition: border-color 0.15s;
+}
+.card:hover { border-color: var(--accent); }
+.stage { aspect-ratio: 4 / 3; background: var(--surface-2); border-radius: var(--radius); overflow: hidden; }
+.stage model-viewer { width: 100%; height: 100%; pointer-events: none; --progress-bar-color: var(--accent); }
+.name { margin: var(--space-1) 0 0; font-size: var(--text-lg); font-weight: 600; line-height: 1.2; }
+.desc { margin: 0; color: var(--text-muted); font-size: var(--text-sm); }
+.error, .empty { margin: 0; padding: var(--space-2); color: var(--text-muted); font-size: var(--text-sm); }
+
+/* ---------- Inspect window ---------- */
+dialog {
+  width: min(68rem, calc(100% - 2 * var(--space-2)));
+  max-height: calc(100vh - 2 * var(--space-2));
+  max-height: calc(100dvh - 2 * var(--space-2));
+  padding: 0; overflow: auto;
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--line); border-radius: var(--radius);
+}
+dialog::backdrop { background: var(--scrim, rgb(9 12 14 / 0.82)); }
+.panel { display: grid; gap: var(--space-2); padding: var(--space-2); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.panel-head h2 { margin: 0; font-size: var(--text-lg); line-height: 1.2; }
+#big {
+  width: 100%; height: min(62vh, 40rem); height: min(62dvh, 40rem);
+  background: var(--surface-2); border-radius: var(--radius);
+  --progress-bar-color: var(--accent);
+}
+#big .ar { position: absolute; right: var(--space-2); bottom: var(--space-2); }
+#inspect-desc { margin: 0; color: var(--text-muted); }
+.tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.tools label { display: flex; align-items: center; gap: var(--space-1); color: var(--text-muted); font-size: var(--text-sm); }
+.tools input[type="range"] { accent-color: var(--accent); }
+.hint { margin: 0; color: var(--text-muted); font-size: var(--text-sm); }
+
+.btn {
+  padding: var(--space-1) var(--space-2); cursor: pointer;
+  background: transparent; color: var(--text); font: inherit; font-size: var(--text-sm);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn:hover, .btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="site-title">3D models</h1>
+    <p class="intro" id="site-intro"></p>
+    <svg class="divider" aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id="knot" width="24" height="12" patternUnits="userSpaceOnUse">
+          <path d="M0 6L6 0L12 6L18 0L24 6M0 6L6 12L12 6L18 12L24 6" fill="none" stroke="currentColor" stroke-width="1.25"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="12" fill="url(#knot)"/>
+    </svg>
+  </header>
+  <main>
+    <div class="grid" id="gallery"></div>
+  </main>
+</div>
+
+<dialog id="inspect" aria-labelledby="inspect-title">
+  <div class="panel">
+    <div class="panel-head">
+      <h2 id="inspect-title"></h2>
+      <button type="button" class="btn" id="close">Close</button>
+    </div>
+    <model-viewer id="big" camera-controls shadow-intensity="1" shadow-softness="1"
+                  ar ar-modes="webxr scene-viewer quick-look">
+      <button slot="ar-button" type="button" class="btn primary ar">View in your space</button>
+    </model-viewer>
+    <p id="inspect-desc"></p>
+    <div class="tools">
+      <button type="button" class="btn" id="rotate" aria-pressed="false">Auto-rotate</button>
+      <button type="button" class="btn" id="reset">Reset view</button>
+      <label>Light <input type="range" id="exposure" min="0.4" max="2" step="0.05" value="1"></label>
+    </div>
+    <p class="hint">Drag to turn, scroll or pinch to zoom, right-drag or use two fingers to pan.</p>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  /* ---------- Edit this part ---------- */
+  const SITE = {
+    title: "3D model showcase",
+    intro: "Select a model to inspect it up close."
+  };
+
+  // Natural daylight lighting. Point this at your own .hdr file in your project
+  // folder to avoid the network request, or set it to "neutral" for studio light.
+  const ENV = "https://modelviewer.dev/shared-assets/environments/spruit_sunrise_1k_HDR.hdr";
+
+  // One entry per model. Paths are relative to this HTML file.
+  const MODELS = [
+    {name: "Rubics Cube", src: "./3dModels/rubics_cube.glb", description: "A 3D model of a Rubics cube.", alt: "A 3D model of a Rubics cube."},
+    {name: "Porsche 911 turbo", src: "./3dModels/porsche911.glb", description: "A 3D model of a Porsche 911 turbo.", alt: "A 3D model of a Porsche 911 turbo."},
+    // { name: "Longship", src: "models/longship.glb", description: "One-line description.", alt: "Optional text for screen readers" },
+  ];
+  /* ------------------------------------ */
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (id) => document.getElementById(id);
+  const gallery = $("gallery");
+  const dialog = $("inspect");
+  const big = $("big");
+  const rotateBtn = $("rotate");
+  const exposure = $("exposure");
+  let env = "neutral";
+
+  document.title = SITE.title;
+  $("site-title").textContent = SITE.title;
+  $("site-intro").textContent = SITE.intro;
+
+  function make(tag, cls, text) {
+    const el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+
+  const loadFailed = (e) => !e.detail || !e.detail.type || e.detail.type === "loadfailure";
+  const failText = (src) => "Could not load " + src + ". Check the file path, and open the page through a local server rather than from the file system.";
+
+  async function pickEnv() {
+    if (ENV === "neutral") return "neutral";
+    try {
+      const signal = typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(4000) : undefined;
+      const res = await fetch(ENV, { method: "HEAD", signal });
+      return res.ok ? ENV : "neutral";
+    } catch (err) {
+      return "neutral";
+    }
+  }
+
+  function buildCard(model) {
+    const btn = make("button", "card");
+    btn.type = "button";
+    btn.setAttribute("aria-haspopup", "dialog");
+
+    const stage = make("div", "stage");
+    const mv = document.createElement("model-viewer");
+    mv.setAttribute("src", model.src);
+    mv.setAttribute("alt", model.alt || model.name);
+    mv.setAttribute("loading", "lazy");
+    mv.setAttribute("reveal", "auto");
+    mv.setAttribute("environment-image", env);
+    mv.setAttribute("shadow-intensity", "1");
+    mv.setAttribute("interaction-prompt", "none");
+    if (!reduceMotion) mv.setAttribute("auto-rotate", "");
+    mv.addEventListener("error", (e) => {
+      if (loadFailed(e)) stage.replaceChildren(make("p", "error", failText(model.src)));
+    });
+    stage.append(mv);
+
+    btn.append(stage, make("h2", "name", model.name), make("p", "desc", model.description || ""));
+    btn.addEventListener("click", () => openInspect(model));
+    return btn;
+  }
+
+  function setRotate(on) {
+    big.toggleAttribute("auto-rotate", on);
+    rotateBtn.setAttribute("aria-pressed", String(on));
+  }
+
+  async function resetView() {
+    // Two-step assignment so the viewer registers a change even if the values match.
+    big.cameraOrbit = "auto auto auto";
+    big.cameraTarget = "auto auto auto";
+    big.fieldOfView = "auto";
+    await big.updateComplete;
+    big.cameraOrbit = "0deg 75deg 105%";
+    await big.updateComplete;
+    if (typeof big.jumpCameraToGoal === "function") big.jumpCameraToGoal();
+    if (typeof big.resetTurntableRotation === "function") big.resetTurntableRotation(0);
+  }
+
+  function openInspect(model) {
+    $("inspect-title").textContent = model.name;
+    $("inspect-desc").textContent = model.description || "";
+    big.setAttribute("environment-image", env);
+    big.setAttribute("alt", model.alt || model.name);
+    big.setAttribute("src", model.src);
+    exposure.value = "1";
+    big.setAttribute("exposure", "1");
+    setRotate(!reduceMotion);
+    dialog.showModal();
+    resetView();
+  }
+
+  big.addEventListener("error", (e) => {
+    if (loadFailed(e)) $("inspect-desc").textContent = failText(big.getAttribute("src"));
+  });
+  rotateBtn.addEventListener("click", () => setRotate(!big.hasAttribute("auto-rotate")));
+  $("reset").addEventListener("click", resetView);
+  exposure.addEventListener("input", () => big.setAttribute("exposure", exposure.value));
+  $("close").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
+  dialog.addEventListener("close", () => big.removeAttribute("src"));
+
+  pickEnv().then((chosen) => {
+    env = chosen;
+    if (!MODELS.length) {
+      gallery.append(make("p", "empty", "No models yet. Add entries to the MODELS list at the top of the script, each with a name, a file path and a short description."));
+      return;
+    }
+    MODELS.forEach((model) => gallery.append(buildCard(model)));
+  });
+})();
+</script>
+</body>
+</html>

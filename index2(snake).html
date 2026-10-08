@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scroll‑tied gradient background</title>
+  <style>
+    /* RESET & BASE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      /* The gradient will be applied to the body, fixed so it doesn't scroll away */
+      background: fixed; /* fallback for older browsers */
+      background-attachment: fixed;
+      min-height: 100vh;
+      font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+      /* Initial gradient (will be updated by JS) */
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      background-attachment: fixed;
+      transition: background 0.1s ease-out; /* smooth tiny updates */
+    }
+
+    /* CONTENT – just to create scrollable space */
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 4rem 2rem 8rem;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 8vw, 4rem);
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin: 3rem 0 1rem;
+      font-weight: 500;
+      border-left: 6px solid rgba(255,255,255,0.6);
+      padding-left: 1.5rem;
+    }
+
+    p {
+      font-size: 1.25rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+
+    .spacer {
+      height: 40vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 300;
+      letter-spacing: 2px;
+      opacity: 0.8;
+      border-top: 1px dashed rgba(255,255,255,0.2);
+      border-bottom: 1px dashed rgba(255,255,255,0.2);
+      margin: 4rem 0;
+    }
+
+    /* Small hint at top */
+    .hint {
+      position: fixed;
+      top: 1rem;
+      right: 1.5rem;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(8px);
+      color: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+      border: 1px solid rgba(255,255,255,0.25);
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* We'll also add a percentage indicator for clarity */
+    .scroll-indicator {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: rgba(20, 20, 30, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 100;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+  <div class="hint">✨ Scroll to shift gradient</div>
+  <div class="scroll-indicator" id="scrollIndicator">0%</div>
+
+  <main class="content">
+    <h1>Gradient that follows your scroll</h1>
+    <p>The background is a linear gradient whose colors and angle change as you scroll down. This is achieved with a few lines of JavaScript that update the <code>background</code> style based on the scroll position.</p>
+    
+    <div class="spacer">↓ keep scrolling ↓</div>
+
+    <h2>How it works</h2>
+    <p>We listen to the <code>scroll</code> event on <code>window</code>, calculate how far the user has scrolled as a percentage of the total scrollable height, and then interpolate between two or more gradient states.</p>
+    <p>You can define your own color stops and even change the gradient angle. The background is fixed (<code>background-attachment: fixed</code>), so it stays in place while the content moves over it.</p>
+
+    <div class="spacer">↓ almost there ↓</div>
+
+    <h2>Customize it</h2>
+    <p>Change the <code>colors</code> array in the script to use your own palette. You can also adjust the angle from 0 to 360 degrees, or mix in radial gradients for a different effect.</p>
+    <p>The transition is smooth because we update the style on every scroll frame, and we use <code>requestAnimationFrame</code> to keep it performant.</p>
+
+    <div class="spacer">↓ you've reached the end ↓</div>
+    <p style="text-align: center; opacity: 0.7;">Thanks for scrolling 🌈</p>
+  </main>
+
+  <script>
+    (function() {
+      // ----- CONFIGURATION -----
+      // Define the gradient colors at the start (scroll = 0) and end (scroll = max).
+      // Each color is an array of color stops (position 0-100%, color).
+      // You can also change the angle over scroll, if you like.
+      
+      // Start gradient: deep purple/blue
+      const startColors = [
+        { pos: 0, color: '#0f0c29' },
+        { pos: 50, color: '#302b63' },
+        { pos: 100, color: '#24243e' }
+      ];
+      
+      // End gradient: vibrant sunset / warm tones
+      const endColors = [
+        { pos: 0, color: '#ff6b6b' },
+        { pos: 40, color: '#feca57' },
+        { pos: 80, color: '#ff9f43' },
+        { pos: 100, color: '#ee5a24' }
+      ];
+
+      // You can also interpolate the angle (in degrees)
+      const startAngle = 135;  // degrees
+      const endAngle = 225;    // degrees
+
+      // ----- DOM ELEMENTS -----
+      const scrollIndicator = document.getElementById('scrollIndicator');
+      
+      // ----- HELPER: interpolate between two numbers -----
+      function lerp(start, end, t) {
+        return start + (end - start) * t;
+      }
+
+      // ----- HELPER: interpolate between two hex colors -----
+      function lerpColor(colorA, colorB, t) {
+        // Parse hex to RGB
+        const parseHex = (hex) => {
+          const h = hex.replace('#', '');
+          return {
+            r: parseInt(h.substring(0, 2), 16),
+            g: parseInt(h.substring(2, 4), 16),
+            b: parseInt(h.substring(4, 6), 16)
+          };
+        };
+
+        const rgbA = parseHex(colorA);
+        const rgbB = parseHex(colorB);
+
+        const r = Math.round(lerp(rgbA.r, rgbB.r, t));
+        const g = Math.round(lerp(rgbA.g, rgbB.g, t));
+        const b = Math.round(lerp(rgbA.b, rgbB.b, t));
+
+        // Convert back to hex
+        const toHex = (c) => {
+          const hex = c.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        };
+
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      }
+
+      // ----- BUILD GRADIENT STRING FROM INTERPOLATED COLORS AND ANGLE -----
+      function buildGradient(colors, angle) {
+        // colors: array of { pos, color }
+        // Sort by position (just in case)
+        const sorted = [...colors].sort((a, b) => a.pos - b.pos);
+        const colorStops = sorted.map(stop => `${stop.color} ${stop.pos}%`).join(', ');
+        return `linear-gradient(${angle}deg, ${colorStops})`;
+      }
+
+      // ----- MAIN FUNCTION: UPDATE BACKGROUND BASED ON SCROLL -----
+      function updateGradient() {
+        // Total scrollable height = document height - viewport height
+        const docHeight = document.documentElement.scrollHeight;
+        const windowHeight = window.innerHeight;
+        const maxScroll = Math.max(1, docHeight - windowHeight); // avoid division by zero
+        
+        // Current scroll position (vertical)
+        const scrollY = window.scrollY || window.pageYOffset;
+        
+        // Progress from 0 to 1 (clamped)
+        let progress = scrollY / maxScroll;
+        progress = Math.min(1, Math.max(0, progress));
+        
+        // Update indicator
+        if (scrollIndicator) {
+          scrollIndicator.textContent = Math.round(progress * 100) + '%';
+        }
+
+        // ----- INTERPOLATE COLORS -----
+        // We need to interpolate between startColors and endColors.
+        // Since the number of stops may differ, we'll use the union of positions.
+        // Simpler approach: interpolate each stop's color if positions match,
+        // otherwise we'll blend by treating both arrays as functions.
+        // But for clarity, let's assume they have the same number of stops for simplicity,
+        // but in this example the end has 4 stops and start has 3. 
+        // To handle that gracefully, we'll create a new set of stops by sampling.
+        // 
+        // Actually, for a smooth transition, we can define a fixed number of stops
+        // (e.g., 5) and interpolate the color at each position between the two gradients.
+        // This is a bit more complex, but we'll keep it simple and just blend
+        // the two gradients by interpolating the color at each start stop position
+        // and then adding any extra end stops? That could cause jumps.
+        //
+        // BETTER APPROACH: Define the gradient as a function of progress by
+        // interpolating between two gradient definitions that have the SAME number of stops.
+        // But since they differ, we'll just do a simple trick: 
+        // Use the start gradient and end gradient and blend them by mixing the entire
+        // gradient string? No, that's not possible.
+        //
+        // Let's make it clean: we'll use 4 fixed positions (0%, 33%, 66%, 100%)
+        // and define start & end colors at those positions. That way they match.
+        // But the original start had 3 stops, end had 4. 
+        // I'll adjust the configuration to have the same number of stops for simplicity,
+        // but mention that you can design your own.
+        
+        // ---- REDEFINING FOR CLARITY (same number of stops) ----
+        // I'll override the start/end arrays to have 4 stops each for a clean lerp.
+        // This keeps the demo straightforward.
+        
+        // Start gradient (4 stops)
+        
+        const startStops = [
+          { pos: 0, color: '#0f0c29' },
+          { pos: 35, color: '#302b63' },
+          { pos: 70, color: '#3a2f6b' },
+          { pos: 100, color: '#24243e' }
+        ];
+        
+        // End gradient (4 stops)
+        const endStops = [
+          { pos: 0, color: '#ff6b6b' },
+          { pos: 35, color: '#feca57' },
+          { pos: 70, color: '#ff9f43' },
+          { pos: 100, color: '#ee5a24' }
+        ];
+
+        // Interpolate each stop
+        const interpolatedStops = startStops.map((startStop, index) => {
+          const endStop = endStops[index];
+          // Both have the same position? We'll use startStop.pos (assuming positions match)
+          const pos = startStop.pos;
+          const color = lerpColor(startStop.color, endStop.color, progress);
+          return { pos, color };
+        });
+
+        // Interpolate angle
+        const angle = lerp(startAngle, endAngle, progress);
+        
+        // Build the gradient string
+        const gradient = buildGradient(interpolatedStops, angle);
+        
+        // Apply to body (with fixed attachment)
+        document.body.style.background = gradient;
+        document.body.style.backgroundAttachment = 'fixed';
+      }
+
+      // ----- THROTTLE WITH requestAnimationFrame FOR SMOOTHNESS -----
+      let ticking = false;
+      
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            updateGradient();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }
+
+      // ----- INITIAL SETUP -----
+      // Set initial gradient (progress 0)
+      updateGradient();
+
+      // Add scroll listener
+      window.addEventListener('scroll', onScroll, { passive: true });
+      
+      // Also update on resize because maxScroll changes
+      window.addEventListener('resize', () => {
+        updateGradient();
+      });
+
+      // For good measure, update after any layout changes
+      window.addEventListener('load', updateGradient);
+    })();
+  </script>
+</body>
+</html>

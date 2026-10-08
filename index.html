@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viking 3D Models</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2L21 11L12 20L3 11Z M7.5 15.5L3 22 M16.5 15.5L21 22' fill='none' stroke='%23c8452d' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;600;700&family=Alegreya:wght@400;500;700&display=swap">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+
+/* Font */
+@font-face {
+  font-family: Norse; /* set name */
+  src: url(./fonts/norse/Norse.otf); /* url of the font */
+}
+@font-face {
+  font-family: Norse; /* set name */
+  src: url(./fonts/norse/Norsebold.otf); /* url of the font */
+}
+/* ---------- Tokens: charcoal stone, bone, one ember-red rune accent ---------- */
+:root {
+  --stone: (21, 22, 24);
+  --light: 255 220 170;
+  --bone: #e8e2d3;
+  --muted: #9b9a93;
+  --ember: #c8452d;
+  --focus: #8fb4d9;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --font-title: "Norse", "Iowan Old Style", Georgia, serif;
+  --font-body: "Alegreya", "Iowan Old Style", Georgia, serif;
+  --text-sm: 1.0625rem;
+  --text-base: 1.1875rem;
+  --text-lg: 1.5rem;
+  --title: clamp(2.25rem, 5.5vw, 4.5rem);
+  --space-1: 0.5rem; --space-2: 1rem; --space-3: 2rem; --space-4: 4rem;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+html { scroll-snap-type: y proximity; }
+body { margin: 0; color: var(--bone); font-family: var(--font-body); font-size: var(--text-base); line-height: 1.7; background-color: var(--stone); background-image: var(--grain); }
+h1, h2, p { margin: 0; }
+h1, h2 { font-family: var(--font-title); font-weight: 600; line-height: 1.05; text-wrap: balance; text-shadow: 0 -1px 0 rgb(0 0 0 / 0.9), 0 1px 0 rgb(255 255 255 / 0.14); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+
+
+/* ---------- Fixed chrome: brand and room dots only ---------- */
+.brand { position: fixed; top: var(--space-2); left: var(--space-3); z-index: 10; display: flex; align-items: center; gap: var(--space-1); font-family: var(--font-title); font-size: var(--text-lg); text-decoration: none; }
+.mark { width: 1.5rem; height: 1.5rem; color: var(--ember); flex: none; }
+.dots { position: fixed; top: 50%; right: var(--space-2); z-index: 10; transform: translateY(-50%); display: grid; gap: 0.9rem; }
+.dots a { display: block; width: 0.7rem; height: 0.7rem; border: 1px solid var(--muted); transform: rotate(45deg); transition: background-color 0.2s, border-color 0.2s; }
+.dots a:hover { border-color: var(--bone); }
+.dots a[aria-current="true"] { background: var(--ember); border-color: var(--ember); }
+
+/* ---------- Rooms ---------- */
+.room { position: relative; display: grid; align-items: center; min-height: 100vh; min-height: 100dvh; padding-block: 5rem; overflow: hidden; scroll-snap-align: start; }
+.room-inner { position: relative; display: grid; gap: var(--space-3); width: 100%; max-width: 80rem; margin-inline: auto; padding-inline: var(--space-3); align-items: center; }
+@media (min-width: 56rem) {
+  .room-inner { grid-template-columns: minmax(16rem, 22rem) 1fr; gap: var(--space-4); }
+  .flip .room-inner { grid-template-columns: 1fr minmax(16rem, 22rem); }
+  .flip .label { order: 2; }
+}
+@media (max-width: 55.99rem) { .stage { order: -1; } }
+
+/* Entrance */
+.hero .room-inner { grid-template-columns: 1fr; max-width: 60rem; }
+.hero h1 { font-size: clamp(3.5rem, 11vw, 8.5rem); }
+.lede { margin-top: var(--space-3); max-width: 34ch; font-size: var(--text-lg); line-height: 1.5; color: var(--muted); }
+.cta { display: inline-block; margin-top: var(--space-3); padding: 0.7rem var(--space-3); color: var(--bone); font-weight: 500; text-decoration: none; border: 1px solid var(--bone); transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+.cta:hover { background: var(--ember); border-color: var(--ember); }
+@media (prefers-reduced-motion: no-preference) {
+  .hero h1, .hero .lede, .hero .cta { animation: rise 1.1s ease both; }
+  .hero .lede { animation-delay: 0.25s; }
+  .hero .cta { animation-delay: 0.5s; }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+
+/* Hero rune field: many small runes, a few of which slowly glow and fade */
+.hero-art { position: absolute; right: 6%; top: 50%; height: 78%; max-height: 40rem; aspect-ratio: 1; transform: translateY(-50%); pointer-events: none; }
+@media (max-width: 55.99rem) { .hero-art { right: -18%; opacity: 0.5; } }
+/* Tile of tiny runes behind the big rune; a few glow slowly */
+.field { position: absolute; inset: -14%; -webkit-mask-image: radial-gradient(circle at center, #000 52%, transparent 71%); mask-image: radial-gradient(circle at center, #000 52%, transparent 71%); }
+/* The big rune sits in front, with a dark moat that dims the tile around its strokes */
+.hero-rune { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--ember); opacity: 0.95; filter: drop-shadow(0 0 12px rgb(21 22 24 / 0.95)) drop-shadow(0 0 30px rgb(200 69 45 / 0.5)); }
+.fr { position: absolute; width: 11px; height: 22px; transform: translate(-50%, -50%); color: var(--bone); opacity: 0.2; }
+.fr.g { color: var(--ember); filter: drop-shadow(0 0 5px rgb(200 69 45 / 0.85)); }
+@media (prefers-reduced-motion: no-preference) { .fr.g { animation: glow var(--d, 5s) ease-in-out infinite; } }
+@media (prefers-reduced-motion: reduce) { .fr.g { opacity: 0.32; } }
+@keyframes glow { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.9; } }
+
+/* Wall label */
+.label { padding-left: var(--space-2); border-left: 2px solid var(--ember); }
+.label .num { display: block; margin-bottom: var(--space-1); font-family: var(--font-title); font-size: var(--text-lg); color: var(--ember); }
+.label h2 { font-size: var(--title); }
+.label p { margin-top: var(--space-2); max-width: 32ch; color: var(--muted); }
+.label .hint { margin-top: var(--space-3); font-size: var(--text-sm); }
+
+/* Stage: carved rune, spotlight, floor pool, model */
+.stage { position: relative; height: min(72vh, 46rem); height: min(72dvh, 46rem); min-height: 22rem; }
+.rune { position: absolute; left: 50%; top: 50%; height: 84%; transform: translate(-50%, -50%); color: var(--ember); opacity: 0.2; pointer-events: none; }
+.beam, .pool { position: absolute; pointer-events: none; transition: opacity 1s ease; }
+.beam { left: 50%; top: -6rem; width: 92%; height: calc(100% + 6rem); transform: translateX(-50%); clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%); background: linear-gradient(180deg, rgb(var(--light) / 0.2), rgb(var(--light) / 0.02) 88%); }
+.pool { left: 50%; bottom: 1%; width: 86%; aspect-ratio: 6 / 1; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(ellipse at center, rgb(var(--light) / 0.3), transparent 70%); }
+.js .beam, .js .pool { opacity: 0; }
+.js .lit .beam, .js .lit .pool { opacity: 1; }
+model-viewer { position: absolute; left: 0; top: 0; width: 100%; height: 94%; background: transparent; --poster-color: transparent; --progress-bar-color: var(--ember); }
+model-viewer .ar { position: absolute; right: 0; bottom: 0; padding: 0.3rem 0.8rem; color: var(--muted); font: inherit; font-size: var(--text-sm); background: none; border: 1px solid var(--muted); cursor: pointer; }
+model-viewer .ar:hover { color: var(--bone); border-color: var(--bone); }
+.status { position: absolute; left: 0; right: 0; bottom: 12%; padding-inline: var(--space-2); text-align: center; color: var(--muted); font-size: var(--text-sm); }
+.note { max-width: 44ch; margin-inline: auto; padding-inline: var(--space-3); color: var(--muted); }
+
+/* Fullscreen window control */
+html.lock { overflow: hidden; }
+.fs { position: absolute; top: 0.6rem; right: 0.6rem; z-index: 3; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; color: var(--bone); cursor: pointer; background: rgb(21 22 24 / 0.65); border: 1px solid rgb(232 226 211 / 0.25); transition: color 0.15s, border-color 0.15s; }
+.fs:hover { color: var(--ember); border-color: var(--ember); }
+.fs svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.fs .i-close, .stage.is-full .fs .i-open { display: none; }
+.stage.is-full .fs .i-close { display: block; }
+.cap { display: none; position: absolute; left: var(--space-3); bottom: var(--space-3); z-index: 2; font-family: var(--font-title); font-size: var(--title); pointer-events: none; text-shadow: 0 0 24px var(--stone); }
+.stage.is-full { height: auto; min-height: 0; overflow: hidden; background-color: var(--stone); background-image: var(--grain); }
+.stage.max { position: fixed; inset: 0; z-index: 100; }
+.stage.is-full model-viewer { height: 100%; }
+.stage.is-full .cap { display: block; }
+.stage.is-full .fs { top: var(--space-2); right: var(--space-2); }
+.stage.is-full model-viewer .ar { right: var(--space-3); bottom: var(--space-3); }
+.js .stage.is-full .beam, .js .stage.is-full .pool { opacity: 1; }
+
+/* ---------- Footer ---------- */
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2); max-width: 80rem; margin-inline: auto; padding: var(--space-3); color: var(--muted); font-size: var(--text-sm); }
+.foot strong { font-family: var(--font-title); font-weight: 600; font-size: var(--text-lg); color: var(--bone); }
+@media (max-width: 40rem) { .brand { left: var(--space-2); } .room-inner { padding-inline: var(--space-2); } .dots { right: 0.5rem; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="mark" viewBox="0 0 24 24"><path d="M12 2L21 11L12 20L3 11Z M7.5 15.5L3 22 M16.5 15.5L21 22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="r0" viewBox="0 0 14 28"><path d="M2 26V2M2 11L11 3M2 20L11 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="r1" viewBox="0 0 14 28"><path d="M2 26V2L11 11V26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="r2" viewBox="0 0 14 28"><path d="M2 26V2M2 8L11 14L2 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="r3" viewBox="0 0 14 28"><path d="M2 26V2M2 6L11 12M2 14L11 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="r4" viewBox="0 0 14 28"><path d="M2 26V2L11 8L2 14L11 26" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="r5" viewBox="0 0 14 28"><path d="M10 6L2 14L10 22" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="r6" viewBox="0 0 14 28"><path d="M2 4L12 24M12 4L2 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="r7" viewBox="0 0 14 28"><path d="M2 26V2L11 8L2 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<a class="brand" href="#hall-0"><svg class="mark" aria-hidden="true"><use href="#mark"/></svg><span id="brand-name">Viking 3D Models</span></a>
+<nav class="dots" id="dots" aria-label="Rooms"></nav>
+
+<main id="top">
+  <section class="room hero" id="hall-0" aria-labelledby="site-title">
+    <div class="hero-art" aria-hidden="true">
+      <div class="field" id="field"></div>
+      <svg class="hero-rune" viewBox="0 0 24 24" focusable="false"><use href="#mark"/></svg>
+    </div>
+    <div class="room-inner">
+      <div>
+        <h1 id="site-title">Viking 3D Models</h1>
+        <p class="lede" id="site-lede"></p>
+        <a class="cta" id="cta" href="#hall-1">Enter the hall</a>
+      </div>
+    </div>
+  </section>
+  <div id="rooms"></div>
+</main>
+
+<footer class="foot">
+  <strong id="footer-title">Viking 3D Models</strong>
+  <a href="#hall-0">Back to the entrance</a>
+</footer>
+
+<script>
+
+(function () {
+  
+  /* ---------- Edit this part ---------- */
+  var SITE = {
+    title: "Viking 3D Models",
+    lede: "Step inside a quiet hall of Viking weapons, armour and artefacts, each lit alone. Scroll to walk through."
+  };
+
+  // One entry per model. Paths are relative to this HTML file.
+  var MODELS = [
+    {name: "Viking Ship", src:"./3dModels/vikingShip.glb", description:"A 3D model of a Viking ship.", alt:"A 3D model of a Viking ship."},
+    {name:"Viking Axe", src:"./3dModels/vikingAxe.glb", description:"A 3D model of a Viking axe.", alt:"A 3D model of a Viking axe."},
+    {name:"Viking Shield", src:"./3dModels/vikingShield.glb", description:"A 3D model of a Viking shield.", alt:"A 3D model of a Viking shield."}
+    // { name: "Model name", src: "models/model.glb", description: "One-line description.", alt: "Optional text for screen readers" },
+  ];
+  /* ------------------------------------ */
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function $(id) { return document.getElementById(id); }
+  var roomsEl = $("rooms"), dotsEl = $("dots");
+  var rooms = [$("hall-0")], dots = [], stages = [];
+
+  document.documentElement.classList.add("js");
+  document.title = SITE.title;
+  $("brand-name").textContent = SITE.title;
+  $("site-title").textContent = SITE.title;
+  $("footer-title").textContent = SITE.title;
+  $("site-lede").textContent = SITE.lede;
+
+  
+
+  function roman(n) {
+    var map = [[10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]], out = "";
+    map.forEach(function (p) { while (n >= p[0]) { out += p[1]; n -= p[0]; } });
+    return out;
+  }
+  function make(tag, cls, text) {
+    var el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+  function addDot(id, label) {
+    var a = make("a"); a.href = "#" + id; a.title = label;
+    a.append(make("span", "sr", label));
+    dotsEl.append(a); dots.push(a);
+  }
+
+  /* ----- Fullscreen: native API where available, a fixed full-window fallback elsewhere (e.g. iPhone) ----- */
+  var ICON = '<svg class="i-open" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>' +
+             '<svg class="i-close" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+  function nativeOn(st) { return document.fullscreenElement === st || document.webkitFullscreenElement === st; }
+  function isFull(st) { return nativeOn(st) || st.classList.contains("max"); }
+  function sync(st) {
+    var on = isFull(st), btn = st.querySelector(".fs"), mv = st.querySelector("model-viewer");
+    st.classList.toggle("is-full", on);
+    btn.setAttribute("aria-pressed", String(on));
+    btn.setAttribute("aria-label", on ? "Exit fullscreen" : "View fullscreen");
+    btn.title = on ? "Exit fullscreen" : "View fullscreen";
+    // Wheel zoom and free touch gestures are only on in fullscreen, so the page keeps scrolling between rooms.
+    if (on) { mv.removeAttribute("disable-zoom"); mv.setAttribute("touch-action", "none"); }
+    else { mv.setAttribute("disable-zoom", ""); mv.setAttribute("touch-action", "pan-y"); }
+  }
+  function fake(st, on) {
+    st.classList.toggle("max", on);
+    document.documentElement.classList.toggle("lock", on);
+    sync(st);
+  }
+  function enter(st) {
+    var req = st.requestFullscreen || st.webkitRequestFullscreen;
+    if (!req) { fake(st, true); return; }
+    try {
+      var pr = req.call(st);
+      if (pr && typeof pr.catch === "function") pr.catch(function () { fake(st, true); });
+    } catch (err) { fake(st, true); }
+  }
+  function leave(st) {
+    if (nativeOn(st)) {
+      var ex = document.exitFullscreen || document.webkitExitFullscreen;
+      if (ex) ex.call(document);
+    } else { fake(st, false); }
+  }
+  function syncAll() { stages.forEach(sync); }
+  document.addEventListener("fullscreenchange", syncAll);
+  document.addEventListener("webkitfullscreenchange", syncAll);
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    stages.forEach(function (st) { if (st.classList.contains("max")) fake(st, false); });
+  });
+  function buildFs(stage) {
+    var fs = make("button", "fs");
+    fs.type = "button";
+    fs.setAttribute("aria-label", "View fullscreen");
+    fs.setAttribute("aria-pressed", "false");
+    fs.title = "View fullscreen";
+    fs.innerHTML = ICON;
+    fs.addEventListener("click", function () { if (isFull(stage)) leave(stage); else enter(stage); });
+    return fs;
+  }
+
+  function buildViewer(m, stage) {
+    var mv = document.createElement("model-viewer");
+    mv.setAttribute("src", m.src);
+    mv.setAttribute("alt", m.alt || m.name);
+    mv.setAttribute("loading", "lazy");
+    mv.setAttribute("reveal", "auto");
+    mv.setAttribute("environment-image", "neutral");
+    mv.setAttribute("shadow-intensity", "1");
+    mv.setAttribute("camera-controls", "");
+    mv.setAttribute("disable-zoom", "");      // keeps the mouse wheel free for scrolling between rooms
+    mv.setAttribute("touch-action", "pan-y"); // vertical swipes scroll the page, sideways swipes turn the model
+    mv.setAttribute("interaction-prompt", "none");
+    mv.setAttribute("ar", "");
+    mv.setAttribute("ar-modes", "webxr scene-viewer quick-look");
+    if (!reduceMotion) mv.setAttribute("auto-rotate", "");
+    var ar = make("button", "ar", "View in your space");
+    ar.type = "button"; ar.slot = "ar-button";
+    mv.append(ar);
+    var status = make("p", "status");
+    status.setAttribute("role", "status");
+    mv.addEventListener("error", function (e) {
+      if (!e.detail || !e.detail.type || e.detail.type === "loadfailure") {
+        mv.hidden = true;
+        status.textContent = "Could not load " + m.src + ". Check the file path, and open the page through a local server rather than from the file system.";
+      }
+    });
+    stage.append(mv, status, make("p", "cap", m.name), buildFs(stage));
+    stages.push(stage);
+  }
+
+  function buildRoom(m, k) {
+    var id = "hall-" + (k + 1);
+    var room = make("section", "room" + (k % 2 ? " flip" : ""));
+    room.id = id;
+    room.setAttribute("aria-labelledby", id + "-title");
+
+    var label = make("div", "label");
+    var h2 = make("h2", "", m.name); h2.id = id + "-title";
+    label.append(make("span", "num", roman(k + 1)), h2, make("p", "", m.description || ""), make("p", "hint", "Drag sideways to turn. Use the corner icon for fullscreen."));
+
+    var stage = make("div", "stage");
+    var rune = make("span");
+    rune.innerHTML = '<svg class="rune" viewBox="0 0 14 28" aria-hidden="true" focusable="false"><use href="#r' + (k % 8) + '"/></svg>';
+    stage.append(rune.firstChild, make("div", "beam"), make("div", "pool"));
+    buildViewer(m, stage);
+
+    var inner = make("div", "room-inner");
+    inner.append(label, stage);
+    room.append(inner);
+    roomsEl.append(room);
+    rooms.push(room);
+    addDot(id, "Room " + roman(k + 1) + ": " + m.name);
+  }
+
+  addDot("hall-0", "Entrance");
+  if (!MODELS.length) {
+    var empty = make("section", "room"); empty.id = "hall-1";
+    empty.append(make("p", "note", "The hall is empty. Add entries to the MODELS list at the top of the script, each with a name, a file path and a short description."));
+    roomsEl.append(empty); rooms.push(empty);
+    $("cta").hidden = true;
+  } else {
+    MODELS.forEach(buildRoom);
+  }
+
+  // Hero background: a field of small runes, a few of which slowly glow and fade.
+  function seeded(a) {
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  var field = $("field"), fieldTimer = 0;
+  function buildField() {
+    var w = field.clientWidth, h = field.clientHeight;
+    if (!w || !h) return;
+    var cols = Math.max(4, Math.floor(w / 44)), rows = Math.max(4, Math.floor(h / 60));
+    var rnd = seeded(5), out = [];
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        var px = (c + 0.5 + (r % 2 ? 0.5 : 0)) / (cols + 0.5), py = (r + 0.5) / rows;
+        var glow = rnd() < 0.1, dur = 8 + rnd() * 8, delay = rnd() * 14;
+        if ((px - 0.5) * (px - 0.5) + (py - 0.5) * (py - 0.5) > 0.25) continue;
+        var style = "left:" + (px * 100).toFixed(2) + "%;top:" + (py * 100).toFixed(2) + "%";
+        if (glow) style += ";--d:" + dur.toFixed(1) + "s;animation-delay:-" + delay.toFixed(1) + "s";
+        out.push('<svg class="fr' + (glow ? " g" : "") + '" viewBox="0 0 14 28" style="' + style + '" aria-hidden="true" focusable="false"><use href="#r' + ((r * 3 + c) % 8) + '"/></svg>');
+      }
+    }
+    field.innerHTML = out.join("");
+  }
+  buildField();
+  window.addEventListener("resize", function () { clearTimeout(fieldTimer); fieldTimer = setTimeout(buildField, 200); });
+
+  // The spotlight comes on when you step into a room, and the matching dot lights up.
+  function setActive(i) { dots.forEach(function (d, k) { if (k === i) d.setAttribute("aria-current", "true"); else d.removeAttribute("aria-current"); }); }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        var i = rooms.indexOf(en.target);
+        if (en.isIntersecting) { en.target.classList.add("lit"); if (i > -1) setActive(i); }
+        else en.target.classList.remove("lit");
+      });
+    }, { threshold: 0.55 });
+    rooms.forEach(function (r) { io.observe(r); });
+  } else {
+    rooms.forEach(function (r) { r.classList.add("lit"); });
+    setActive(0);
+  }
+
+  //gradually change the background color from light to dark as the user scrolls down the page
+  const lightColor = [21, 22, 24]; // rgb at top of page
+  const darkColor  = [5, 7, 9];    // rgb at bottom of page
+
+  const root = document.documentElement;
+
+  // ---------- The expensive work (only runs once per frame) ----------
+  function updateBackground() {
+    const docHeight    = root.scrollHeight;
+    const windowHeight = window.innerHeight;
+    const maxScroll    = Math.max(1, docHeight - windowHeight);
+    const scrollY      = window.scrollY || window.pageYOffset;
+
+    let progress = scrollY / maxScroll;
+    progress = Math.min(1, Math.max(0, progress));
+
+    // Optional: smoothstep easing for a more organic feel
+    progress = progress * progress * (3 - 2 * progress);
+
+    const rgb = lightColor.map((light, i) => {
+      const dark = darkColor[i];
+      return Math.round(light + (dark - light) * progress);
+    });
+
+    root.style.backgroundColor = `rgb(${rgb.join(',')})`;
+  }
+
+  // ---------- rAF throttle ----------
+  let ticking = false;
+
+  function onScroll() {
+    if (!ticking) {
+      window.requestAnimationFrame(() => {
+        updateBackground();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+
+  // ---------- Wire it up ----------
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', updateBackground);
+
+  // Initial paint
+  updateBackground();
+  // If the viewer script is blocked (offline, content blocker), say so instead of showing empty rooms.
+  window.addEventListener("load", function () {
+    if (MODELS.length && !customElements.get("model-viewer")) {
+      document.querySelectorAll(".status").forEach(function (s) { s.textContent = "The 3D viewer could not be loaded. Check your internet connection and reload."; });
+    }
+  });
+})();
+</script>
+</body>
+</html>
